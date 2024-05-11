@@ -1,10 +1,8 @@
-project: data_pipeline
-# By default, the registry is a file (but can be turned into a more scalable SQL-backed registry)
-registry: 
-    path: registry/registry.db
-    cache_rrl_Seconds: 5
-# The provider primarily specifies default offline / online stores & storing the registry in a given cloud
+project: feast_demo
 provider: local
+registry:
+    path: registry/local_registry.db
+    cache_ttl_seconds: 5
 online_store:
     type: redis
     connection_string: localhost:6378

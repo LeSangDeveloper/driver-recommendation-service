@@ -1,20 +1,22 @@
-from feast import Filesource, KafkaSource
-from feast.data_format import JsonFormat, ParquetFormat
-
 from datetime import timedelta
 
-driver_stats_parquet_file = "../../data_sources/driver_stats.parquet"
+from feast import FileSource, KafkaSource
+from feast.data_format import JsonFormat, ParquetFormat
+import os
+
+driver_stats_parquet_file =  os.environ.get('DRIVER_RECOMMENDATION_PRJ_DIR') + "/data_sources/driver_stats.parquet"
 
 driver_stats_batch_source = FileSource(
-    name="driver_stats", 
-    file_format=ParquetFormat(), 
-    path=driver_stats_parquet_file,     
+    name="driver_stats",
+    file_format=ParquetFormat(),
+    path=driver_stats_parquet_file,
     timestamp_field="datetime",
-    created_timestamp_column="created",)
+    created_timestamp_column="created",
+)
 
 driver_stats_stream_source = KafkaSource(
     name="driver_stats_stream",
-    kafka_boostrap_servers="localhost:29092",
+    kafka_bootstrap_servers="localhost:29092",
     topic="drivers",
     timestamp_field="datetime",
     batch_source=driver_stats_batch_source,
