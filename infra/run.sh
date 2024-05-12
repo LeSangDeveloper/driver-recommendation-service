@@ -49,6 +49,39 @@ up_all() {
     up_kafka "$@"
 }
 
+down() {
+    service=$1
+    echo "$service"
+    shift
+    docker_compose_file=$(get_docker_compose_file $service)
+
+    docker-compose -f "$docker_compose_file" down "$@"
+}
+
+down_kafka() {
+    down "$KAFKA" "$@"
+}
+
+down_airflow() {
+    down "$AIRFLOW" "$@"
+}
+
+down_mlflow() {
+    down "$MLFLOW" "$@"
+}
+
+down_redis() {
+    down "$REDIS" "$@"
+}
+
+down_all() {
+    echo "all"
+    down_airflow "$@"
+    down_kafka "$@"
+    down_redis "$@"
+    down_mlflow "$@"
+}
+
 if [[ -z "$cmd" ]]; then
     echo "Missing command"
     exit 1
@@ -78,6 +111,28 @@ up)
             ;;
         "$KAFKA")
             up_kafka "$@"
+            ;;
+    esac
+    ;;
+down)
+    case $service in
+        all)
+            down_all "$@"
+            ;;
+        "$AIRFLOW")
+            down_airflow "$@"
+            ;;
+        "$KAFKA")
+            down_kafka "$@"
+            ;;
+        "$REDIS")
+            down_redis "$@"
+            ;;
+        "$MLFLOW")
+            down_mlflow "$@"
+            ;;
+        *)
+            echo "Unknown service"
             ;;
     esac
     ;;
