@@ -4,7 +4,7 @@ RUN apt-get update
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-COPY deployment/requirements.txt .
+COPY ./deployment/requirements.txt .
 RUN pip install -r requirements.txt
 
 FROM python:3.9-slim
@@ -24,5 +24,9 @@ ENV JAVA_HOME=/opt/jdk11
 COPY --from=build /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-COPY . /data_pipeline
+COPY ./ /data_pipeline
 WORKDIR /data_pipeline
+
+CMD ["fastapi", "run", "app/main.py", "--port", "80"]
+
+EXPOSE 80

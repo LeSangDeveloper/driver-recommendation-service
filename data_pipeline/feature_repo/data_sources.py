@@ -4,7 +4,7 @@ from feast import FileSource, KafkaSource
 from feast.data_format import JsonFormat, ParquetFormat
 import os
 
-driver_stats_parquet_file =  str(os.environ.get('DRIVER_RECOMMENDATION_PRJ_DIR')) + "/data_sources/driver_stats.parquet"
+driver_stats_parquet_file =  "./data_sources/driver_stats.parquet"
 
 driver_stats_batch_source = FileSource(
     name="driver_stats",
