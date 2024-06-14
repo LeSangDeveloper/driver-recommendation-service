@@ -8,6 +8,20 @@ REDIS="redis"
 KAFKA="kafka"
 MLFLOW="mlflow"
 
+usage() {
+    echo "run.sh <service> <command> [options]"
+    echo "Available services:"
+    echo "  all                 all services"
+    echo "  $AIRFLOW            airflow service"
+    echo "  $REDIS              redis service"
+    echo "  $KAFKA              kafka service"
+    echo "  $MLFLOW             mlflow service"
+    echo "Availables commands:"
+    echo "  up                  deploy services"
+    echo "  down                stop and remove containers, networks"
+    echo "  restart             down then up"
+}
+
 get_docker_compose_file() {
     service=$1
     docker_compose_file="$service/docker-compose.yml"
@@ -84,11 +98,13 @@ down_all() {
 
 if [[ -z "$cmd" ]]; then
     echo "Missing command"
+    usage
     exit 1
 fi
 
 if [[ -z "$service" ]]; then
     echo "Missing service"
+    usage
     exit 1
 fi
 
@@ -112,6 +128,10 @@ up)
         "$KAFKA")
             up_kafka "$@"
             ;;
+        *)
+            echo "Unknwown service"
+            usage
+            ;;
     esac
     ;;
 down)
@@ -133,10 +153,12 @@ down)
             ;;
         *)
             echo "Unknown service"
+            usage
             ;;
     esac
     ;;
 *)
     echo "Unknown command"
+    usage
     exit 1
 esac
