@@ -7,6 +7,7 @@ AIRFLOW="airflow"
 REDIS="redis"
 KAFKA="kafka"
 MLFLOW="mlflow"
+RESTART_SLEEP_SEC=2
 
 usage() {
     echo "run.sh <service> <command> [options]"
@@ -157,6 +158,37 @@ down)
             ;;
     esac
     ;;
+restart)
+    case $service in
+        all)
+            down_all "$@"
+            sleep $RESTART_SLEEP_SEC
+            up_all "$@"
+            ;;
+        "$AIRFLOW")
+            down_airflow "$@"
+            sleep $RESTART_SLEEP_SEC
+            up_airflow
+            ;;
+        "$KAFKA")
+            down_kafka "$@"
+            sleep $RESTART_SLEEP_SEC
+            up_kafka
+            ;;
+        "$REDIS")
+            down_redis "$@"
+            sleep $RESTART_SLEEP_SEC
+            up_redis
+            ;;
+        "$MLFLOW")
+            down_mlflow "$@"
+            sleep $RESTART_SLEEP_SEC
+            up_mlflow
+            ;;
+        *)
+            echo "Unknown service"
+            usage
+            ;;
 *)
     echo "Unknown command"
     usage
