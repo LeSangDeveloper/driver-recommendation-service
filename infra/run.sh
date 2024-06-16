@@ -189,6 +189,8 @@ restart)
             echo "Unknown service"
             usage
             ;;
+    esac
+    ;;
 *)
     echo "Unknown command"
     usage
