@@ -15,7 +15,7 @@ spark.conf.set("spark.sql.shuffle.partitions", 5)
 
 store = FeatureStore(repo_path="../../feature_repo")
 
-def preprocess_fn(rows: pd.Dataframe):
+def preprocess_fn(rows: pd.DataFrame):
     print(f"df columns: {rows.columns}")
     print(f"df size: {rows.size}")
     print(f"df preview:\n{rows.head()}")

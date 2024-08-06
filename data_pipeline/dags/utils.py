@@ -22,7 +22,8 @@ class DefaultConfig:
     }
 
     DEFAULT_DOCKER_OPERATOR_ARGS = {
-        "image": f"{AppConst.DOCKER_USER}/mlops_crash_course/data_pipeline:latest",
+        # "image": f"{AppConst.DOCKER_USER}/mlops_crash_course/data_pipeline:latest",
+        "image": f"driver-recommendation/data_pipeline:0.0",
         "api_version": "auto",
         "auto_remove": True,
         "mounts": [
