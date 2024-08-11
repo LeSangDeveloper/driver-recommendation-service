@@ -21,12 +21,14 @@ with DAG(
 ) as dag:
     stream_to_online_task = DockerOperator(
         task_id="stream_to_online_task",
+        network_mode="host",
         command="/bin/bash -c 'cd src/stream_to_stores && python ingest.py --store online'",
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,
     )
 
     stream_to_offline_task = DockerOperator(
         task_id="stream_to_offline_task",
+        network_mode="host",
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,
         command="/bin/bash -c 'cd src/stream_to_stores && python ingest.py --store offline'",
     )
