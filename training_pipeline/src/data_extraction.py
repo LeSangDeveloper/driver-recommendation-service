@@ -27,7 +27,7 @@ def extract_data():
     date_time_list = [str(datetime.utcfromtimestamp(dt.astype(int) / 1e9).isoformat()) for dt in orders["datetime"].values] 
 
     # call api
-    url = 'http://127.0.0.1:3000/get-offline-features'
+    url = 'http://localhost:3000/get-offline-features'
 
     payload = {
         "driverIds": driver_list,
