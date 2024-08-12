@@ -7,9 +7,18 @@ import pandas as pd
 from feast import FeatureStore
 from datetime import datetime
 
+from pathlib import Path
+import os
+
 jsonpickle_pandas.register_handlers()
 
 app = FastAPI()
+
+class AppPath:
+    ROOT = Path(os.environ.get("DATA_PIPELINE_DIR", "/data_pipeline"))
+    DATA = ROOT / "data"
+    DATA_SOURCES = ROOT / "data_sources"
+    FEATURE_REPO = ROOT / "feature_repo"
 
 class OfflineRequestBody(BaseModel):
     driverIds: List[int]
@@ -29,7 +38,7 @@ def read_root():
 def post_offline_store(request_body: OfflineRequestBody):
     request_body.convert_datetimes()  # Convert all datetime strings to datetime objects
 
-    store = FeatureStore(repo_path="./feature_repo")
+    store = FeatureStore(repo_path=AppPath.FEATURE_REPO)
     entity_df = pd.DataFrame.from_dict(
         {
             "driver_id": request_body.driverIds,
@@ -37,7 +46,7 @@ def post_offline_store(request_body: OfflineRequestBody):
         }
     )
     training_df = store.get_historical_features(
-        entity_df=entity_df, features=["driver_stats:acc_rate", "driver_stats:conv_rate"],
+        entity_df=entity_df, features=["driver_stats:acc_rate", "driver_stats:conv_rate", "driver_stats:avg_daily_trips"],
     ).to_df()
     p = Pickler()
     response = p.flatten(training_df)
@@ -45,7 +54,7 @@ def post_offline_store(request_body: OfflineRequestBody):
 
 @app.post("/get-online-features")
 def post_online_store(request_body: OnlineRequestBody):
-    store = FeatureStore(repo_path="./feature_repo")
+    store = FeatureStore(repo_path=AppPath.FEATURE_REPO)
     features = store.get_online_features(
         features=[
             "driver_stats:acc_rate",
