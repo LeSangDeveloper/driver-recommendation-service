@@ -27,8 +27,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY ./ /data_pipeline
 WORKDIR /data_pipeline
 
-RUN source setup_env.sh
-
 CMD ["fastapi", "run", "app/main.py", "--port", "80"]
 
 EXPOSE 80
