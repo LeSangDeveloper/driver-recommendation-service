@@ -20,6 +20,7 @@ with DAG(
     tags=["data_pipeline"],
 ) as dag:
     stream_to_online_task = DockerOperator(
+        image="driver-recommendation/data_pipeline:0.0",
         task_id="stream_to_online_task",
         network_mode="host",
         command="/bin/bash -c 'cd src/stream_to_stores && python ingest.py --store online'",
@@ -27,6 +28,7 @@ with DAG(
     )
 
     stream_to_offline_task = DockerOperator(
+        image="driver-recommendation/data_pipeline:0.0",
         task_id="stream_to_offline_task",
         network_mode="host",
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,

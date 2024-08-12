@@ -20,19 +20,46 @@ with DAG(
     tags=["data_pipeline"],
 ) as dag:
     ingest_task = DockerOperator(
+        image="driver-recommendation/data_pipeline:0.0",
         task_id="ingest_task",
+        network_mode="host",
+        mounts=[
+            Mount(
+                source=AppPath.FEATURE_REPO.absolute().as_posix(),
+                target="/data_pipeline/feature_repo",
+                type="bind",
+            ),
+        ],
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,
         command="/bin/bash -c 'cd src/db_to_offline_store && python ingest.py'",
     )
 
     clean_task = DockerOperator(
+        image="driver-recommendation/data_pipeline:0.0",
         task_id="clean_task",
+        network_mode="host",
+        mounts=[
+            Mount(
+                source=AppPath.FEATURE_REPO.absolute().as_posix(),
+                target="/data_pipeline/feature_repo",
+                type="bind",
+            ),
+        ],
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,
         command="/bin/bash -c 'cd src/db_to_offline_store && python clean.py'",
     )
 
     explore_and_validate_task = DockerOperator(
+        image="driver-recommendation/data_pipeline:0.0",
         task_id="explore_and_validate_task",
+        network_mode="host",
+        mounts=[
+            Mount(
+                source=AppPath.FEATURE_REPO.absolute().as_posix(),
+                target="/data_pipeline/feature_repo",
+                type="bind",
+            ),
+        ],
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,
         command="/bin/bash -c 'cd src/db_to_offline_store && python explore_and_validate.py'",
     )

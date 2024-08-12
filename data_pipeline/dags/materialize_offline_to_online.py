@@ -20,7 +20,9 @@ with DAG(
     tags=["data_pipeline"],
 ) as dag:
     materialize_task = DockerOperator(
+        image="driver-recommendation/data_pipeline:0.0",
         task_id="materialize_task",
+        network_mode="host",
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,
         command="/bin/bash ./scripts/feast_helper.sh materialize",
     )
