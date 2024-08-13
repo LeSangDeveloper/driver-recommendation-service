@@ -4,5 +4,5 @@
 **/__pycache__
 **/registry/local_registry.db
 data_pipeline/feature_repo/registry/
-training_pipeline/artifacts/**.json
-training_pipeline/artifacts/**.parquet
+**/artifacts/**.json
+**/artifacts/**.parquet
