@@ -28,7 +28,7 @@ class OfflineRequestBody(BaseModel):
         self.datetimes = [datetime.fromisoformat(dt) if isinstance(dt, str) else dt for dt in self.datetimes]
 
 class OnlineRequestBody(BaseModel):
-    driverId: int
+    driverIds: List[int]
 
 @app.get("/")
 def read_root():
@@ -46,7 +46,8 @@ def post_offline_store(request_body: OfflineRequestBody):
         }
     )
     training_df = store.get_historical_features(
-        entity_df=entity_df, features=["driver_stats:acc_rate", "driver_stats:conv_rate", "driver_stats:avg_daily_trips"],
+        entity_df=entity_df, 
+        features=["driver_stats:acc_rate", "driver_stats:conv_rate", "driver_stats:avg_daily_trips"],
     ).to_df()
     p = Pickler()
     response = p.flatten(training_df)
@@ -55,15 +56,11 @@ def post_offline_store(request_body: OfflineRequestBody):
 @app.post("/get-online-features")
 def post_online_store(request_body: OnlineRequestBody):
     store = FeatureStore(repo_path=AppPath.FEATURE_REPO)
+    print(request_body.driverIds)
     features = store.get_online_features(
-        features=[
-            "driver_stats:acc_rate",
-            "driver_stats:conv_rate"
-        ],
-        entity_rows=[
-        {
-            "driver_id": request_body.driverId,
-        }
-    ],
-    ).to_dict(include_event_timestamps=True)
-    return features
+        features=["driver_stats:acc_rate", "driver_stats:conv_rate", "driver_stats:avg_daily_trips"],
+        entity_rows=[{"driver_id": driver_id} for driver_id in request_body.driverIds],
+    ).to_df()
+    p = Pickler()
+    response = p.flatten(features)
+    return response

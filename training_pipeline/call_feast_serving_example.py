@@ -82,7 +82,7 @@ url = 'http://127.0.0.1:3000/get-online-features'
 
 # Define the request payload
 payload = {
-    "driverId": 1001
+    "driverIds": [1001, 1002, 1003]
 }
 
 # Define the headers
@@ -98,7 +98,10 @@ response = requests.post(url, json=payload, headers=headers)
 if response.status_code == 200:
     print("Response from server:")
     response_json = response.json()
-    print(response_json)
+    # Use Unpickler to parse the response to a DataFrame
+    u = Unpickler()
+    df = u.restore(response_json)
+    print(df)
 else:
     print(f"Failed to get response. Status code: {response.status_code}")
     print("Response content:", response.content)
