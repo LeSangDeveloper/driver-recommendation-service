@@ -23,6 +23,13 @@ with DAG(
         image="driver-recommendation/data_pipeline:0.0",
         task_id="stream_to_online_task",
         network_mode="host",
+        mounts=[
+            Mount(
+                source=AppPath.FEATURE_REPO.absolute().as_posix(),
+                target="/data_pipeline/feature_repo",
+                type="bind",
+            ),
+        ],
         command="/bin/bash -c 'cd src/stream_to_stores && python ingest.py --store online'",
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,
     )
@@ -31,6 +38,13 @@ with DAG(
         image="driver-recommendation/data_pipeline:0.0",
         task_id="stream_to_offline_task",
         network_mode="host",
+        mounts=[
+            Mount(
+                source=AppPath.FEATURE_REPO.absolute().as_posix(),
+                target="/data_pipeline/feature_repo",
+                type="bind",
+            ),
+        ],
         **DefaultConfig.DEFAULT_DOCKER_OPERATOR_ARGS,
         command="/bin/bash -c 'cd src/stream_to_stores && python ingest.py --store offline'",
     )
