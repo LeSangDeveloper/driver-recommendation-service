@@ -7,4 +7,5 @@ fastparquet==0.8.3
 mlflow==1.29.0
 pandas==1.4.4
 pyspark==3.0.1
+starlette==0.24.0
 scikit-learn==1.1.2
