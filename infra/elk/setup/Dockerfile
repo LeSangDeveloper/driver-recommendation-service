@@ -13,4 +13,4 @@ RUN set -eux; \
 
 USER elasticsearch:root
 
-ENTRYPOINT ["/entrypont.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
