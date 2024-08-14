@@ -7,6 +7,8 @@ AIRFLOW="airflow"
 REDIS="redis"
 KAFKA="kafka"
 MLFLOW="mlflow"
+ELK="elk"
+
 RESTART_SLEEP_SEC=2
 
 usage() {
@@ -17,6 +19,7 @@ usage() {
     echo "  $REDIS              redis service"
     echo "  $KAFKA              kafka service"
     echo "  $MLFLOW             mlflow service"
+    echo "  $ELK                elk service"
     echo "Availables commands:"
     echo "  up                  deploy services"
     echo "  down                stop and remove containers, networks"
@@ -57,11 +60,16 @@ up_mlflow() {
     up "$MLFLOW" "$@"
 }
 
+up_elk() {
+    docker-compose -f "$ELK/$ELK-docker-compose.yml" -f "$ELK/extensions/filebeat/filebeat-compose.yml" up -d "$@"
+}
+
 up_all() {
     up_airflow "$@"
     up_redis "$@"
     up_mlflow "$@"
     up_kafka "$@"
+    up_elk "$@"
 }
 
 down() {
@@ -89,12 +97,17 @@ down_redis() {
     down "$REDIS" "$@"
 }
 
+down_elk() {
+    docker-compose -f "$ELK/$ELK-docker-compose.yml" -f "$ELK/extensions/filebeat/filebeat-compose.yml" down "$@"
+}
+
 down_all() {
     echo "all"
     down_airflow "$@"
     down_kafka "$@"
     down_redis "$@"
     down_mlflow "$@"
+    down_elk "$@"
 }
 
 if [[ -z "$cmd" ]]; then
@@ -129,6 +142,9 @@ up)
         "$KAFKA")
             up_kafka "$@"
             ;;
+        "$ELK")
+            up_elk "$@"
+            ;;
         *)
             echo "Unknwown service"
             usage
@@ -151,6 +167,9 @@ down)
             ;;
         "$MLFLOW")
             down_mlflow "$@"
+            ;;
+        "$ELK")
+            down_elk "$@"
             ;;
         *)
             echo "Unknown service"
@@ -184,6 +203,11 @@ restart)
             down_mlflow "$@"
             sleep $RESTART_SLEEP_SEC
             up_mlflow
+            ;;
+        "$ELK")
+            down_elk "$@"
+            sleep $RESTART_SLEEP_SEC
+            up_elk
             ;;
         *)
             echo "Unknown service"
