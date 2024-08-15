@@ -172,7 +172,7 @@ def inference(request: InferenceRequest, ctx: bentoml.Context) -> Dict[str, Any]
         driver_ids = request.driver_ids
         
         # Define the URL of the FastAPI endpoint
-        url = 'http://127.0.0.1:3000/get-online-features'
+        url = 'http://feastapp:8000/get-online-features'
         
         # Define the request payload
         payload = {"driverIds": [driver_id for driver_id in driver_ids]} 
@@ -189,15 +189,14 @@ def inference(request: InferenceRequest, ctx: bentoml.Context) -> Dict[str, Any]
         
         # Check if the request was successful
         if response_from_feature_app.status_code == 200:
-            print("Response from server:")
             response_json = response_from_feature_app.json()
             # Use Unpickler to parse the response to a DataFrame
             u = Unpickler()
             df = u.restore(response_json)
-            print(df)
+            Log().log.info(f"response from feature service: {df}")
         else:
-            print(f"Failed to get response. Status code: {response_from_feature_app.status_code}")
-            print("Response content:", response_from_feature_app.content)
+            Log().log.error(f"Failed to get response from feature server. Status code: {response_from_feature_app.status_code}")
+            Log().log.error(f"Error :", {response_from_feature_app.content})
 
         Log().log.info(f"online features: {df}")
 
