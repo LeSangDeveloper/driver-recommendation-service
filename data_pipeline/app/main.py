@@ -9,6 +9,28 @@ from datetime import datetime
 
 from pathlib import Path
 import os
+import logging
+
+class AppConst:
+    LOG_LEVEL = logging.DEBUG
+
+class Log:
+    log: logging.Logger = None
+
+    def __init__(self, name="") -> None:
+        if Log.log == None:
+            Log.log = self._init_logger(name)
+
+    def _init_logger(self, name):
+        logger = logging.getLogger(name)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
+        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
+        logger.setLevel(AppConst.LOG_LEVEL)
+        return logger
 
 jsonpickle_pandas.register_handlers()
 
@@ -51,6 +73,7 @@ def post_offline_store(request_body: OfflineRequestBody):
     ).to_df()
     p = Pickler()
     response = p.flatten(training_df)
+    Log().log.info(f"response from datasource store: ", {response})
     return response
 
 @app.post("/get-online-features")
@@ -63,4 +86,5 @@ def post_online_store(request_body: OnlineRequestBody):
     ).to_df()
     p = Pickler()
     response = p.flatten(features)
+    Log().log.info(f"response from online store: ", {response})
     return response
