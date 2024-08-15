@@ -9,6 +9,7 @@ from datetime import datetime
 
 from pathlib import Path
 import os
+import sys
 import logging
 
 class AppConst:
@@ -73,7 +74,7 @@ def post_offline_store(request_body: OfflineRequestBody):
     ).to_df()
     p = Pickler()
     response = p.flatten(training_df)
-    Log().log.info(f"response from datasource store: ", {response})
+    Log().log.info(f"response from datasource store: ", {str(response)})
     return response
 
 @app.post("/get-online-features")
@@ -86,5 +87,5 @@ def post_online_store(request_body: OnlineRequestBody):
     ).to_df()
     p = Pickler()
     response = p.flatten(features)
-    Log().log.info(f"response from online store: ", {response})
+    Log().log.info(f"response from online store: ", {str(response)})
     return response

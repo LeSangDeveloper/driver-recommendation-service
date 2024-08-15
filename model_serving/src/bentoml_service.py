@@ -197,6 +197,9 @@ def inference(request: InferenceRequest, ctx: bentoml.Context) -> Dict[str, Any]
         else:
             Log().log.error(f"Failed to get response from feature server. Status code: {response_from_feature_app.status_code}")
             Log().log.error(f"Error :", {response_from_feature_app.content})
+            response.error = str(response_from_feature_app.content)
+            ctx.response.status_code = 500
+            return
 
         Log().log.info(f"online features: {df}")
 
