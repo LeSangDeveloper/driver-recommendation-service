@@ -11,6 +11,19 @@ class AppConst:
     DATA_EXTRACTION = "data_extraction"
     BATCH_PREDICTION = "batch_prediction"
 
+# the encoder helps to convert NumPy types in source data to JSON-compatible types
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.void):
+            return None
+
+        if isinstance(obj, (np.generic, np.bool_)):
+            return obj.item()
+
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+
+        return obj
 
 class AppPath:
     # set MODEL_SERVING_DIR in dev environment for quickly testing the code
@@ -217,6 +230,13 @@ def inference(request: InferenceRequest, ctx: bentoml.Context) -> Dict[str, Any]
         response.prediction = best_driver_id
         ctx.response.status_code = 200
 
+        # monitor
+        monitor_df = df.iloc[[best_idx]]
+        monitor_df = monitor_df.assign(request_id=[request.request_id])
+        monitor_df = monitor_df.assign(best_driver_id=[best_driver_id])
+        Log().log.info(f"monitor_df: {monitor_df}")
+        monitor_request(monitor_df)
+
     except Exception as e:
         Log().log.error(f"error: {e}")
         response.error = str(e)
@@ -224,3 +244,30 @@ def inference(request: InferenceRequest, ctx: bentoml.Context) -> Dict[str, Any]
 
     Log().log.info(f"response: {response}")
     return response
+
+def monitor_request(df: pd.DataFrame):
+    Log().log.info("start monitor_request")
+    try:
+        data = json.dumps(df.to_dict(), cls=NumpyEncoder)
+
+        Log().log.info(f"sending {data}")
+        response = requests.post(
+            config.monitoring_service_api,
+            data=data,
+            headers={"content-type": "application/json"},
+        )
+
+        if response.status_code == 200:
+            Log().log.info(f"Success")
+        else:
+            Log().log.info(
+                f"Got an error code {response.status_code} for the data chunk. Reason: {response.reason}, error text: {response.text}"
+            )
+
+    except requests.exceptions.ConnectionError as error:
+        Log().log.error(
+            f"Cannot reach monitoring service, error: {error}, data: {data}"
+        )
+
+    except Exception as error:
+        Log().log.error(f"Error: {error}")
