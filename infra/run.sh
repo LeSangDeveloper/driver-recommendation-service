@@ -9,6 +9,7 @@ KAFKA="kafka"
 MLFLOW="mlflow"
 ELK="elk"
 PROM_GRAF="prom-graf"
+JENKINS="jenkins"
 
 RESTART_SLEEP_SEC=2
 
@@ -21,6 +22,8 @@ usage() {
     echo "  $KAFKA              kafka service"
     echo "  $MLFLOW             mlflow service"
     echo "  $ELK                elk service"
+    echo "  $PROM_GRAF          prometheus and grafana service"
+    echo "  $JENKINS            jenkins service"
     echo "Availables commands:"
     echo "  up                  deploy services"
     echo "  down                stop and remove containers, networks"
@@ -69,12 +72,18 @@ up_elk() {
     docker-compose -f "$ELK/$ELK-docker-compose.yml" -f "$ELK/extensions/filebeat/filebeat-compose.yml" up -d "$@"
 }
 
+up_jenkins() {
+    up "$JENKINS" "$@"
+}
+
 up_all() {
     up_airflow "$@"
     up_redis "$@"
     up_mlflow "$@"
     up_kafka "$@"
     up_elk "$@"
+    up_prom_graf "$@"
+    up_jenkins "$@"
 }
 
 down() {
@@ -110,6 +119,10 @@ down_elk() {
     docker-compose -f "$ELK/$ELK-docker-compose.yml" -f "$ELK/extensions/filebeat/filebeat-compose.yml" down "$@"
 }
 
+down_jenkins() {
+    down "$JENKINS" "$@"
+}
+
 down_all() {
     echo "all"
     down_airflow "$@"
@@ -117,6 +130,8 @@ down_all() {
     down_redis "$@"
     down_mlflow "$@"
     down_elk "$@"
+    down_prom_graf "$@"
+    down_jenkins "$@"
 }
 
 if [[ -z "$cmd" ]]; then
@@ -157,6 +172,9 @@ up)
         "$ELK")
             up_elk "$@"
             ;;
+        "$JENKINS")
+            up_jenkins "$@"
+            ;;
         *)
             echo "Unknwown service"
             usage
@@ -185,6 +203,9 @@ down)
             ;;
         "$PROM_GRAF")
             down_prom_graf "$@"
+            ;;
+        "$JENKINS")
+            down_jenkins "$@"
             ;;
         *)
             echo "Unknown service"
@@ -226,6 +247,11 @@ restart)
             ;;
         "$ELK")
             down_elk "$@"
+            sleep $RESTART_SLEEP_SEC
+            up_elk
+            ;;
+        "$JENKINS")
+            down_jenkins "$@"
             sleep $RESTART_SLEEP_SEC
             up_elk
             ;;
