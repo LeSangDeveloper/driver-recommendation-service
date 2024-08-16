@@ -8,6 +8,7 @@ REDIS="redis"
 KAFKA="kafka"
 MLFLOW="mlflow"
 ELK="elk"
+PROM_GRAF="prom_graf"
 
 RESTART_SLEEP_SEC=2
 
@@ -38,6 +39,10 @@ up() {
     docker_compose_file=$(get_docker_compose_file $service)
 
     docker-compose -f "$docker_compose_file" up -d "$@"
+}
+
+up_prom_graf() {
+    up "$PROM_GRAF" "$@"
 }
 
 up_airflow() {
@@ -83,6 +88,10 @@ down() {
 
 down_kafka() {
     down "$KAFKA" "$@"
+}
+
+down_prom_graf() {
+    down "$PROM_GRAF" "$@"
 }
 
 down_airflow() {
@@ -142,6 +151,9 @@ up)
         "$KAFKA")
             up_kafka "$@"
             ;;
+        "$PROM_GRAF")
+            up_prom_graf "$@"
+            ;;
         "$ELK")
             up_elk "$@"
             ;;
@@ -171,6 +183,9 @@ down)
         "$ELK")
             down_elk "$@"
             ;;
+        "$PROM_GRAF")
+            down_prom_graf "$@"
+            ;;
         *)
             echo "Unknown service"
             usage
@@ -183,6 +198,11 @@ restart)
             down_all "$@"
             sleep $RESTART_SLEEP_SEC
             up_all "$@"
+            ;;
+        "$PROM_GRAF")
+            down_prom_graf "$@"
+            sleep $RESTART_SLEEP_SEC
+            up_prom_graf "$@"
             ;;
         "$AIRFLOW")
             down_airflow "$@"
