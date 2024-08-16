@@ -8,7 +8,7 @@ REDIS="redis"
 KAFKA="kafka"
 MLFLOW="mlflow"
 ELK="elk"
-PROM_GRAF="prom_graf"
+PROM_GRAF="prom-graf"
 
 RESTART_SLEEP_SEC=2
 
