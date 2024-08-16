@@ -23,12 +23,5 @@ pipeline {
             }
         }
 
-        stage('deploy data pipeline') {
-            when {changeset "data_pipeline/**" }
-
-            steps {
-                sh 'cd data_pipeline && make deploy_dags'
-            }
-        }
-    }
+        // TODO deploy stage
 }
