@@ -17,6 +17,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 ENV MLFLOW_TRACKING_URI="http://localhost:5000"
 ENV BATCH_INPUT_FILE="./data/batch_request.csv"
 ENV REGISTERED_MODEL_FILE="./artifacts/registered_model_version.json"
+ENV MONITORING_SERVICE_API="http://localhost:8309/iterate"
 
 COPY . /model_serving
 WORKDIR /model_serving
